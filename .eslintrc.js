@@ -1,10 +1,11 @@
 module.exports = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
-    project: 'tsconfig.json',
-    tsconfigRootDir: __dirname,
+    ecmaVersion: 2022,
+    project: './tsconfig.eslint.json',
     sourceType: 'module',
   },
+
   plugins: ['@typescript-eslint', 'prettier', 'sonarjs', 'promise'],
   extends: [
     'plugin:@typescript-eslint/recommended',
@@ -20,7 +21,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'dist', 'node_modules', 'src/global.d.ts'],
   rules: {
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // Fix the eslint error `no-unused-vars` that on the injected provider
@@ -28,5 +29,11 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
 };
