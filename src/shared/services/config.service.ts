@@ -31,8 +31,8 @@ export class ServerConfigService {
 
   get postgresConfig(): TypeOrmModuleOptions {
     const entities = [
-      __dirname + '/../modules/**/*.entity{.ts,.js}',
-      __dirname + '/../modules/**/*.view-entity{.ts,.js}',
+      __dirname + '/../../modules/**/*.entity{.ts,.js}',
+      __dirname + '/../../modules/**/*.view-entity{.ts,.js}',
     ];
     const migrations = [__dirname + '/../../database/migrations/*{.ts,.js}'];
 
@@ -40,7 +40,7 @@ export class ServerConfigService {
       entities,
       migrations,
       keepConnectionAlive: this.env.isStaging || this.env.isProd,
-      dropSchema: this.env.isDev,
+      dropSchema: false,
       type: 'postgres',
       name: 'micro-shop',
       host: this.getString('DB_HOST'),

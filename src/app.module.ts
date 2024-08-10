@@ -7,7 +7,9 @@ import { ClsModule } from 'nestjs-cls';
 import { SharedModule } from './shared/shared.module';
 import { ServerConfigService } from './shared/services/config.service';
 
-import { UserModule } from './modules';
+import { UserModule, AuthModule } from './modules';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from './guards';
 
 @Module({
   imports: [
@@ -39,7 +41,13 @@ import { UserModule } from './modules';
       },
     }),
     UserModule,
+    AuthModule,
   ],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+  ],
 })
 export class AppModule {}
