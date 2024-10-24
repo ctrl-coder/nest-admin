@@ -5,7 +5,9 @@ import { UserEntity } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
 import { UserRegisterDto } from './dto/user-register.dto';
-import { jwtConfigs } from '@/constants';
+// import { jwtConfigs } from '@/constants';
+import { RedisService } from '@/shared/services/redis.service';
+import { redisConfigs } from '@/constants/redis';
 
 @Injectable()
 export class AuthService {
@@ -13,6 +15,7 @@ export class AuthService {
     @InjectRepository(UserEntity)
     private readonly user: Repository<UserEntity>,
     private readonly jwtService: JwtService,
+    private readonly redisService: RedisService,
   ) {}
 
   async getUser(user: UserEntity) {
@@ -21,11 +24,21 @@ export class AuthService {
 
   async login(user: Partial<UserEntity>) {
     const payload = { username: user.username, role: user.role };
-    const accessToken = this.jwtService.sign(payload, {
-      secret: jwtConfigs.secret,
-    });
+    const accessToken = this.jwtService.sign(payload);
+    await this.redisService.set(
+      user.id,
+      accessToken,
+      redisConfigs.jwtTokenExpiresIn,
+    );
     return {
       access_token: accessToken,
+    };
+  }
+
+  async logout(user: Partial<UserEntity>) {
+    await this.redisService.del(user.id);
+    return {
+      message: '登出成功',
     };
   }
 

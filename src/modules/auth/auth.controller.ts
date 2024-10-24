@@ -26,9 +26,16 @@ export class AuthController {
 
   // 登录
   @UseGuards(LocalAuthGuard)
+  @PublicRoute()
   @Post('/login')
   @HttpCode(HttpStatus.OK)
   login(@Body() _loginData: UserLoginDto, @Req() req) {
     return this.authService.login(req.user);
+  }
+
+  @Post('/logout')
+  @HttpCode(HttpStatus.OK)
+  logout(@Req() req) {
+    return this.authService.logout(req.user);
   }
 }

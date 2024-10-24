@@ -29,6 +29,15 @@ export class ServerConfigService {
     };
   }
 
+  get redisConfig() {
+    return {
+      host: this.getString('REDIS_HOST'),
+      port: this.getNumber('REDIS_PORT'),
+      db: this.getNumber('REDIS_DB'),
+      password: this.getString('REDIS_PASSWORD'),
+    };
+  }
+
   get postgresConfig(): TypeOrmModuleOptions {
     const entities = [
       __dirname + '/../../modules/**/*.entity{.ts,.js}',

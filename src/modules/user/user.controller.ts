@@ -1,20 +1,33 @@
-import { Controller, Get, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
 import { PublicRoute } from '@/decorators';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 @ApiTags('users')
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get('admin')
-  @HttpCode(HttpStatus.OK)
-  async admin(_user: UserEntity, _req: Request) {
-    return {
-      text: `admin dayday`,
-    };
+  @Post()
+  @HttpCode(HttpStatus.CREATED)
+  async create(@Body() userDto: CreateUserDto) {
+    return await this.userService.create(userDto);
+  }
+
+  @Get(':username')
+  @HttpCode(HttpStatus.CREATED)
+  async findOne(@Param() { username }: { username: string }) {
+    return await this.userService.findOne(username);
   }
 
   @PublicRoute()

@@ -7,9 +7,10 @@ import { ClsModule } from 'nestjs-cls';
 import { SharedModule } from './shared/shared.module';
 import { ServerConfigService } from './shared/services/config.service';
 
-import { UserModule, AuthModule } from './modules';
+import { UserModule, AuthModule, DepartmentModule } from './modules';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards';
+import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
   imports: [
@@ -22,6 +23,17 @@ import { JwtAuthGuard } from './guards';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+    }),
+    RedisModule.forRootAsync({
+      inject: [ServerConfigService],
+      useFactory: ({ redisConfig }: ServerConfigService) => ({
+        type: 'single',
+        url: `redis://${redisConfig.host}:${redisConfig.port}`,
+        options: {
+          password: redisConfig.password,
+          // db: 0
+        },
+      }),
     }),
 
     TypeOrmModule.forRootAsync({
@@ -42,6 +54,7 @@ import { JwtAuthGuard } from './guards';
     }),
     UserModule,
     AuthModule,
+    DepartmentModule,
   ],
   providers: [
     {
