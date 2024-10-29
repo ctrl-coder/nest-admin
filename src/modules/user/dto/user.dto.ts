@@ -1,5 +1,5 @@
 import { AbstractDto } from '@/common/dto/abstract.dto';
-import { Maybe } from '@/common/type';
+import { Maybe } from '@/common/types';
 import { UserEntity } from '../user.entity';
 import { DepartmentEneity } from '@/modules/department/department.entity';
 

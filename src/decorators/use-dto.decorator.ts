@@ -1,4 +1,4 @@
-import { Constructor } from '@/common/type';
+import { Constructor } from '@/common/types';
 
 export function UseDto(dtoClass: Constructor): ClassDecorator {
   return (ctor) => {

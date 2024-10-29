@@ -11,6 +11,9 @@ import { UserModule, AuthModule, DepartmentModule } from './modules';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './guards';
 import { RedisModule } from '@nestjs-modules/ioredis';
+import { PositionModule } from './position/position.module';
+import { RoleModule } from './role/role.module';
+import { MenuModule } from './menu/menu.module';
 
 @Module({
   imports: [
@@ -55,6 +58,9 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     UserModule,
     AuthModule,
     DepartmentModule,
+    PositionModule,
+    RoleModule,
+    MenuModule,
   ],
   providers: [
     {

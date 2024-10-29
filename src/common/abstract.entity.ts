@@ -4,7 +4,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { AbstractDto } from './dto/abstract.dto';
-import { Constructor } from './type';
+import { Constructor } from './types';
 
 export abstract class AbstractEntity<
   DTO extends AbstractDto = AbstractDto,
