@@ -25,11 +25,12 @@ export class UserController {
   }
 
   @Get(':username')
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async findOne(@Param() { username }: { username: string }) {
     return await this.userService.findOne(username);
   }
 
+  // TODO: Delete the unused controller, it's for the `@PublicRoute()` testing
   @PublicRoute()
   @Get('visitor')
   @HttpCode(HttpStatus.OK)

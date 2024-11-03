@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { initializeTransactionalContext } from 'typeorm-transactional';
 import { SharedModule } from './shared/shared.module';
 import { ServerConfigService } from './shared/services/config.service';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   initializeTransactionalContext();
@@ -10,6 +11,8 @@ async function bootstrap() {
 
   const configService = app.select(SharedModule).get(ServerConfigService);
   const port = configService.appConfig.port;
+
+  app.useGlobalPipes(new ValidationPipe());
 
   await app.listen(port);
 }

@@ -1,4 +1,4 @@
-import { CommonStatus, MenuType } from '@/common/types';
+import { CommonStatus, MenuTypeEnum } from '@/common/types';
 import { RoleEntity } from '@/modules/role/entities/role.entity';
 import {
   Column,
@@ -63,10 +63,10 @@ export class MenuEntity {
   @Column({
     name: 'menu_type',
     type: 'enum',
-    enum: MenuType,
+    enum: MenuTypeEnum,
     comment: '菜单类型，D: 目录，M：菜单，B：按钮',
   })
-  public menuType: MenuType;
+  public menuType: MenuTypeEnum;
 
   @Column({
     type: 'varchar',

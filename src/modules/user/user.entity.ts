@@ -7,6 +7,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  JoinColumn,
 } from 'typeorm';
 import { UserDto } from './dto/user.dto';
 import { DepartmentEneity } from '../department/department.entity';
@@ -44,11 +45,19 @@ export class UserEntity extends AbstractEntity<UserDto> {
   })
   fullName: string;
 
+  @Column({ nullable: true, type: 'int' })
+  departmentId: Maybe<number>;
+
   @ManyToOne(() => DepartmentEneity, (department) => department.users)
-  department: DepartmentEneity;
+  @JoinColumn({ name: 'department_id' })
+  department!: DepartmentEneity;
+
+  @Column({ nullable: true, type: 'int' })
+  positionId: Maybe<number>;
 
   @ManyToOne(() => PositionEntity, (position) => position.users)
-  position: DepartmentEneity;
+  @JoinColumn({ name: 'position_id' })
+  position!: DepartmentEneity;
 
   @ManyToMany(() => RoleEntity)
   @JoinTable({

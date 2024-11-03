@@ -1,11 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { isNil } from 'lodash';
+import {
+  BadRequestException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { UserEntity } from './user.entity';
 import { UserDto } from './dto/user.dto';
 import { DepartmentEneity } from '../department/department.entity';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { RoleEntity } from '../role/entities/role.entity';
+import { Maybe } from '@/common/types';
+import { CommonRes } from '@/common/utils/common-res';
 
 @Injectable()
 export class UserService {
@@ -14,23 +24,55 @@ export class UserService {
     private userRepository: Repository<UserEntity>,
     @InjectRepository(DepartmentEneity)
     private departmentRepository: Repository<DepartmentEneity>,
+    @InjectRepository(RoleEntity)
+    private roleRepository: Repository<RoleEntity>,
   ) {}
 
-  async create(userDto: CreateUserDto): Promise<UserDto> {
-    const queryBuilder = await this.departmentRepository
-      .createQueryBuilder('department')
-      .where('department.id = :id', { id: userDto.department });
+  async validateDuplicated(conditions: { key: string; value: any }[]) {
+    for (let index = 0; index < conditions.length; index++) {
+      const condition = conditions[index];
+      const isExisted = await this.userRepository.findOneBy({
+        [condition.key]: condition.value,
+      });
+      if (isExisted) {
+        throw new BadRequestException(`${condition.key} is exited`);
+      }
+    }
+  }
 
-    const departmentEntity = await queryBuilder.getOne();
-    const randomInitialPassword = 'abc';
-    const encryptedPassword = bcryptjs.hashSync(randomInitialPassword, 10);
+  async create(userDto: CreateUserDto): Promise<any> {
+    await this.validateDuplicated([
+      { key: 'username', value: userDto.username },
+      { key: 'email', value: userDto.email },
+    ]);
+
+    const encryptedPassword = bcryptjs.hashSync(userDto.initialPassword, 10);
+
+    const roleIds = userDto.roles;
+    const roles = isNil(roleIds)
+      ? null
+      : await this.roleRepository.findBy({ id: In(roleIds) });
+
+    if (Array.isArray(roles) && roles.length !== roleIds.length) {
+      throw new BadRequestException();
+    }
 
     const savedUser = await this.userRepository.save({
       ...userDto,
       password: encryptedPassword,
-      department: departmentEntity,
+      roles: roles,
     });
-    return savedUser.toDto();
+
+    // TODO: call the `.toDto()` method to convert it.
+    return CommonRes.ok(savedUser);
+  }
+
+  async update(_userDto: UpdateUserDto): Promise<UserDto> {
+    return null;
+  }
+
+  async getUsers(): Promise<UserDto[]> {
+    return [];
   }
 
   async findOne(username: string): Promise<UserDto> {

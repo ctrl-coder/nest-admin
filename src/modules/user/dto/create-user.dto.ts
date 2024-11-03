@@ -1,34 +1,69 @@
 import { AbstractDto } from '@/common/dto/abstract.dto';
-import { Maybe } from '@/common/types';
-import { UserEntity } from '../user.entity';
+import { Maybe, SexEnum } from '@/common/types';
+import {
+  IsArray,
+  IsBoolean,
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export type UserDtoOptions = Partial<{ isActive: boolean }>;
 
 export class CreateUserDto extends AbstractDto {
-  firstName: Maybe<string>;
+  @IsNotEmpty()
+  @IsString()
+  @Length(0, 50)
+  nickName: Maybe<string>;
 
-  lastName: Maybe<string>;
+  @IsNotEmpty()
+  @Length(0, 50)
+  username: string;
 
-  username!: string;
+  @IsNotEmpty()
+  @IsString()
+  @Length(0, 50)
+  initialPassword: string;
 
+  @IsOptional()
+  @IsNumber()
+  departmentId: Maybe<number>;
+
+  @IsOptional()
+  @IsEmail()
+  @Length(0, 50)
   email: Maybe<string>;
 
-  avatar: Maybe<string>;
+  // @IsOptional()
+  // @IsString()
+  // avatar: Maybe<string>;
 
+  @IsNumber()
+  @IsOptional()
+  positionId: Maybe<number>;
+
+  @IsArray()
+  @IsNumber({}, { each: true }) // Each of the items are Number type
+  @IsOptional()
+  roles: Maybe<number[]>;
+
+  @IsEnum(SexEnum)
+  sex: Maybe<SexEnum>;
+
+  @Length(0, 20)
+  @IsOptional()
   phone: Maybe<string>;
 
+  @IsBoolean()
+  @IsOptional()
   isActive?: boolean;
 
-  department!: number;
-
-  constructor(user: UserEntity, options?: UserDtoOptions) {
-    super();
-    this.email = user.email;
-    this.avatar = user.avatar;
-    this.phone = user.phone;
-    this.isActive = options?.isActive;
-    this.firstName = user.firstName;
-    this.lastName = user.lastName;
-    this.department = user.department.id;
-  }
+  @IsString()
+  @Length(0, 200)
+  @IsOptional()
+  remark: Maybe<string>;
 }
