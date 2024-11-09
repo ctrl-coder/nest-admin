@@ -1,8 +1,7 @@
 import { AbstractDto } from '@/common/dto/abstract.dto';
-import { Maybe, SexEnum } from '@/common/types';
+import { CommonStatus, Maybe, SexEnum } from '@/common/types';
 import {
   IsArray,
-  IsBoolean,
   IsEmail,
   IsEnum,
   IsNotEmpty,
@@ -11,8 +10,6 @@ import {
   IsString,
   Length,
 } from 'class-validator';
-
-export type UserDtoOptions = Partial<{ isActive: boolean }>;
 
 export class CreateUserDto extends AbstractDto {
   @IsNotEmpty()
@@ -58,9 +55,9 @@ export class CreateUserDto extends AbstractDto {
   @IsOptional()
   phone: Maybe<string>;
 
-  @IsBoolean()
+  @IsNumber()
   @IsOptional()
-  isActive?: boolean;
+  status: Maybe<CommonStatus>;
 
   @IsString()
   @Length(0, 200)

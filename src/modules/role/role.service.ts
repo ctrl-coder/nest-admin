@@ -1,11 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { In, Repository } from 'typeorm';
+import { RoleEntity } from './entities/role.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CommonRes } from '@/common/utils/common-res';
+import { MenuEntity } from '../menu/entities/menu.entity';
 
 @Injectable()
 export class RoleService {
-  create(createRoleDto: CreateRoleDto) {
-    return 'This action adds a new role';
+  constructor(
+    @InjectRepository(RoleEntity)
+    private roleRepository: Repository<RoleEntity>,
+    @InjectRepository(MenuEntity)
+    private menuRepository: Repository<MenuEntity>,
+  ) {}
+  async create(createRoleDto: CreateRoleDto) {
+    const menuEntities = await this.menuRepository.findBy({
+      id: In(createRoleDto.menus),
+    });
+    if (menuEntities.length !== createRoleDto.menus.length) {
+      throw new BadRequestException('menu_id不存在!');
+    }
+
+    const savedRole = await this.roleRepository.save({
+      ...createRoleDto,
+      menus: menuEntities,
+    });
+    // TODO: should call the `.toDTO()` to convert the entity.
+    return CommonRes.ok(savedRole);
   }
 
   findAll() {
@@ -16,8 +39,10 @@ export class RoleService {
     return `This action returns a #${id} role`;
   }
 
-  update(id: number, updateRoleDto: UpdateRoleDto) {
-    return `This action updates a #${id} role`;
+  async update(id: number, updateRoleDto: UpdateRoleDto) {
+    const updatedRole = await this.roleRepository.update({ id }, {});
+
+    return CommonRes.ok(updatedRole);
   }
 
   remove(id: number) {

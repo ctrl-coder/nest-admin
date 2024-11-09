@@ -1,7 +1,12 @@
-import { RolePermission } from '@/common/types';
 import { MenuEntity } from '@/modules/menu/entities/menu.entity';
 import { UserEntity } from '@/modules/user/user.entity';
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'roles' })
 export class RoleEntity {
@@ -10,23 +15,36 @@ export class RoleEntity {
 
   @Column({
     type: 'varchar',
-    name: 'role_name',
+    name: 'name',
     length: 30,
     comment: '角色名称',
   })
-  public roleName: string;
+  public name: string;
 
   @Column({
-    type: 'enum',
-    enum: RolePermission,
-    comment: '角色权限列表',
-    array: true,
+    type: 'int',
+    name: 'order',
+    default: 0,
+    comment: '角色顺序',
   })
-  permissions: RolePermission[];
+  public order: number;
+
+  @Column({
+    type: 'int',
+    name: 'status',
+    default: 2,
+    comment: '启用状态 1:normal、 0:disabled',
+  })
+  public status: number;
 
   @ManyToMany(() => UserEntity, (user) => user.roles)
   users: UserEntity[];
 
   @ManyToMany(() => MenuEntity, (menu) => menu.roles)
+  @JoinTable({
+    name: 'menus_roles',
+    joinColumn: { name: 'role_id' },
+    inverseJoinColumn: { name: 'menu_id' },
+  }) // Create the related table
   menus: MenuEntity[];
 }

@@ -9,10 +9,20 @@ export enum OrderEnum {
   DESC = 'DESC',
 }
 
-export enum CommonStatus {
-  Deleted = 0,
+export enum DeletableStatus {
+  Deleted = 2,
   Normal = 1,
-  Disabled = 2,
+  Disabled = 0,
+}
+
+export enum CommonStatus {
+  Normal = 1,
+  Disabled = 0,
+}
+
+export enum BooleanStatus {
+  true = 1,
+  false = 0,
 }
 
 export enum MenuTypeEnum {

@@ -14,7 +14,6 @@ import { DepartmentEneity } from '../department/department.entity';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { RoleEntity } from '../role/entities/role.entity';
-import { Maybe } from '@/common/types';
 import { CommonRes } from '@/common/utils/common-res';
 
 @Injectable()
@@ -56,6 +55,10 @@ export class UserService {
     if (Array.isArray(roles) && roles.length !== roleIds.length) {
       throw new BadRequestException();
     }
+    /**
+     * TODO: 添加role_id、department_id的业务校验逻辑，
+     * 将roles、department等数据缓存到redis，减少数据库查询次数
+     */
 
     const savedUser = await this.userRepository.save({
       ...userDto,
