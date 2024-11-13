@@ -10,7 +10,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
-import { PublicRoute } from '@/decorators';
+import { PublicRoute, RequirePermission } from '@/decorators';
 import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
@@ -18,6 +18,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UserController {
   constructor(private userService: UserService) {}
 
+  @RequirePermission('system:user:add')
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(@Body() userDto: CreateUserDto) {

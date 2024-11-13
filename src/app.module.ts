@@ -16,7 +16,7 @@ import {
   MenuModule,
 } from './modules';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './guards';
+import { JwtAuthGuard, PermissionGuard, RolesGuard } from './guards';
 import { RedisModule } from '@nestjs-modules/ioredis';
 
 @Module({
@@ -70,6 +70,14 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
     },
   ],
 })

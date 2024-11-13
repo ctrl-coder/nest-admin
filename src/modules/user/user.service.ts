@@ -53,7 +53,7 @@ export class UserService {
       : await this.roleRepository.findBy({ id: In(roleIds) });
 
     if (Array.isArray(roles) && roles.length !== roleIds.length) {
-      throw new BadRequestException();
+      throw new BadRequestException('Invalid roles params!');
     }
     /**
      * TODO: 添加role_id、department_id的业务校验逻辑，

@@ -8,12 +8,19 @@ import { UserRegisterDto } from './dto/user-register.dto';
 // import { jwtConfigs } from '@/constants';
 import { RedisService } from '@/shared/services/redis.service';
 import { redisConfigs } from '@/constants/redis';
+import { MenuEntity } from '../menu/entities/menu.entity';
+import { generateUUID } from '@/common/utils';
+import { CacheEnum } from '@/common/types';
 
 @Injectable()
 export class AuthService {
   constructor(
+    // TODO: refactor it and use the user service.
     @InjectRepository(UserEntity)
     private readonly user: Repository<UserEntity>,
+    @InjectRepository(MenuEntity)
+    private readonly menuRepository: Repository<MenuEntity>,
+
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
   ) {}
@@ -23,11 +30,34 @@ export class AuthService {
   }
 
   async login(user: Partial<UserEntity>) {
-    const payload = { username: user.username, roles: user.roles };
+    const uuid = generateUUID();
+    const payload = {
+      userId: user.id,
+      uuid: uuid,
+    };
     const accessToken = this.jwtService.sign(payload);
+
+    const roleIds = user.roles.map((v) => v.id);
+    // TODO: extra to a single method and use menuService but not menoRepository
+    const menus = await this.menuRepository
+      .createQueryBuilder('menu')
+      .innerJoin('menu.roles', 'role')
+      .where('role.id IN (:...roleIds)', { roleIds })
+      .getMany();
+
+    const permissions = menus.map((v) => v.perms);
+    const roles = user.roles.map((v) => v.name);
+
+    const metaData = {
+      token: uuid,
+      roles,
+      permissions,
+      username: user.username,
+      id: user.id,
+    };
     await this.redisService.set(
-      user.id,
-      accessToken,
+      `${CacheEnum.LOGIN_TOKEN_KEY}${uuid}`,
+      metaData,
       redisConfigs.jwtTokenExpiresIn,
     );
     return {

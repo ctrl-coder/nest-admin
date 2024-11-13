@@ -19,6 +19,7 @@ export class RoleService {
     const menuEntities = await this.menuRepository.findBy({
       id: In(createRoleDto.menus),
     });
+
     if (menuEntities.length !== createRoleDto.menus.length) {
       throw new BadRequestException('menu_id不存在!');
     }

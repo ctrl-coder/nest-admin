@@ -1,19 +1,20 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ExtractJwt, Strategy, StrategyOptions } from 'passport-jwt';
-import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
 import { UserEntity } from '@/modules/user/user.entity';
 import { Repository } from 'typeorm';
 import { UnauthorizedException } from '@nestjs/common';
 import { jwtConfigs } from '@/constants';
+import { RedisService } from '@/shared/services/redis.service';
+import { CacheEnum } from '@/common/types';
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly configService: ConfigService,
-    private readonly authService: AuthService,
+    private readonly redisService: RedisService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -21,12 +22,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     } as StrategyOptions);
   }
 
-  async validate(user: UserEntity) {
-    const existUser = await this.authService.getUser(user);
+  async validate(payload: { uuid: string; userId: string }) {
+    const user = await this.redisService.get(
+      `${CacheEnum.LOGIN_TOKEN_KEY}${payload.uuid}`,
+    );
 
-    if (!existUser) {
-      throw new UnauthorizedException('token不正确');
+    if (!user) {
+      throw new UnauthorizedException('token is invalid!');
     }
-    return existUser;
+    return user;
   }
 }

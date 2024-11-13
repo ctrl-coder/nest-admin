@@ -21,6 +21,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     const user = await this.userRepository
       .createQueryBuilder('user')
       .addSelect('user.password')
+      .leftJoinAndSelect('user.roles', 'roles')
       .where('user.username=:username', { username })
       .getOne();
 
