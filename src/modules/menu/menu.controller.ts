@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Request,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
@@ -36,7 +37,17 @@ export class MenuController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.menuService.remove(+id);
+  remove(@Param('id') id: number) {
+    return this.menuService.remove(id);
+  }
+
+  @Get('/accessible')
+  getUserMenus(@Request() req) {
+    const userId: string = req.user.user.userId;
+    console.log(userId);
+
+    console.log('====================l');
+
+    return this.menuService.getAllAccessibleMenus(userId);
   }
 }

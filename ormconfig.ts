@@ -3,6 +3,9 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 
 import { SnakeNamingStrategy } from './src/snake-naming.strategy';
 
+const migrationsDir =
+  process.env.MIGRATIONS_DIR || 'src/database/migrations/**';
+
 config();
 
 export const ormConfig = {
@@ -17,7 +20,7 @@ export const ormConfig = {
   // subscribers: [UserSubscriber],
   // synchronize: true,
   entities: ['src/**/*.entity{.ts,.js}', 'src/**/*.view-entity{.ts,.js}'],
-  migrations: ['src/database/migrations/*{.ts,.js}'],
+  migrations: [`${migrationsDir}/*{.ts,.js}`],
 } as DataSourceOptions;
 
 export default new DataSource(ormConfig);

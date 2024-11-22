@@ -21,9 +21,12 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli",
     "migration:generate": "pnpm run typeorm migration:generate src/database/migrations/%npm_config_name% -d ./ormconfig",
-    "migration:create": "pnpm run typeorm migration:create src/database/migrations/%npm_config_name%",
-    "migration:revert": "pnpm run typeorm migration:revert -d ormconfig",
-    "migration:run": "pnpm run typeorm migration:run -d ormconfig"
+    "migration:schema-create": "pnpm run typeorm migration:create src/database/migrations/schema/%npm_config_name%",
+    "migration:schema-run": "cross-env MIGRATIONS_DIR=src/migrations/schema pnpm run typeorm migration:run -d ormconfig",
+    "migration:schema-revert": "cross-env MIGRATIONS_DIR=src/database/migrations/schema pnpm run typeorm migration:revert -d ormconfig",
+    "migration:data-create": "pnpm run typeorm migration:create src/database/migrations/data/%npm_config_name%",
+    "migration:data-run": "cross-env MIGRATIONS_DIR=src/database/migrations/data pnpm run typeorm migration:run -d ormconfig",
+    "migration:data-revert": "cross-env MIGRATIONS_DIR=src/database/migrations/data pnpm run typeorm migration:revert -d ormconfig"
   },
   "dependencies": {
     "@nestjs-modules/ioredis": "^2.0.2",
@@ -63,6 +66,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.2",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.3.1",
     "@types/passport-jwt": "^4.0.1",
     "@types/supertest": "^6.0.0",

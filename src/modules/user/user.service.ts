@@ -1,7 +1,6 @@
 import { isNil } from 'lodash';
 import {
   BadRequestException,
-  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -92,5 +91,32 @@ export class UserService {
     }
 
     return userEntity.toDto();
+  }
+
+  async getRoles(id: string): Promise<RoleEntity[]> {
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+    const users = await queryBuilder
+      .leftJoinAndSelect('user.role', 'role')
+      .where('user.id = :id', { id });
+
+    console.log(users);
+
+    return [];
+
+    // 优化手段1，直接查询中间表
+    // const roleIds = await getRepository('user_roles') // 默认中间表命名为 `user_roles`
+    //   .createQueryBuilder('userRole')
+    //   .select('userRole.roleId', 'roleId') // 选择关联的角色 ID
+    //   .where('userRole.userId = :userId', { userId })
+    //   .getRawMany();
+
+    // 优化手段2，关联查询，过滤无用字段
+    // const roleIds = await userRepository
+    //   .createQueryBuilder('user')
+    //   .leftJoin('user.roles', 'role')
+    //   .where('user.id = :id', { id: userId })
+    //   .select('role.id')
+    //   .getMany();
   }
 }

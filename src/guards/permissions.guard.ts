@@ -16,6 +16,7 @@ export class PermissionGuard implements CanActivate {
     //不需要鉴权
     if (prem === undefined) return true;
     //调用鉴权
+
     return this.hasPermission(prem, req.user.permissions);
   }
 
