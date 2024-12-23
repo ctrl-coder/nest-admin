@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Request,
+  Put,
 } from '@nestjs/common';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
@@ -14,7 +15,7 @@ import { UpdateMenuDto } from './dto/update-menu.dto';
 
 @Controller('menus')
 export class MenuController {
-  constructor(private readonly menuService: MenuService) {}
+  constructor(private readonly menuService: MenuService) { }
 
   @Post()
   create(@Body() createMenuDto: CreateMenuDto) {
@@ -23,7 +24,14 @@ export class MenuController {
 
   @Get()
   findAll() {
-    return this.menuService.findAll();
+    return this.menuService.findAllMenus();
+  }
+
+  @Get('accessible')
+  getUserMenus(@Request() req) {
+    const userId: string = req.user.id;
+
+    return this.menuService.getAllAccessibleMenus(userId);
   }
 
   @Get(':id')
@@ -31,23 +39,13 @@ export class MenuController {
     return this.menuService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateMenuDto: UpdateMenuDto) {
-    return this.menuService.update(+id, updateMenuDto);
+    return this.menuService.update(Number(id), updateMenuDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: number) {
     return this.menuService.remove(id);
-  }
-
-  @Get('/accessible')
-  getUserMenus(@Request() req) {
-    const userId: string = req.user.user.userId;
-    console.log(userId);
-
-    console.log('====================l');
-
-    return this.menuService.getAllAccessibleMenus(userId);
   }
 }

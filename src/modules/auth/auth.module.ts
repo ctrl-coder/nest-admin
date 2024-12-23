@@ -9,6 +9,7 @@ import { PassportModule } from '@nestjs/passport';
 import { LocalStrategy } from './strategy/local.strategy';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { MenuEntity } from '../menu/entities/menu.entity';
+import { MenuService } from '../menu/menu.service';
 
 // import { ConfigService } from '@nestjs/config';
 
@@ -33,6 +34,6 @@ import { MenuEntity } from '../menu/entities/menu.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, MenuService],
 })
-export class AuthModule {}
+export class AuthModule { }

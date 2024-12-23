@@ -4,7 +4,7 @@ import { Reflector } from '@nestjs/core';
 
 @Injectable()
 export class PermissionGuard implements CanActivate {
-  constructor(private reflector: Reflector) {}
+  constructor(private reflector: Reflector) { }
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
@@ -16,7 +16,6 @@ export class PermissionGuard implements CanActivate {
     //不需要鉴权
     if (prem === undefined) return true;
     //调用鉴权
-
     return this.hasPermission(prem, req.user.permissions);
   }
 

@@ -81,4 +81,4 @@ import { RedisModule } from '@nestjs-modules/ioredis';
     },
   ],
 })
-export class AppModule {}
+export class AppModule { }

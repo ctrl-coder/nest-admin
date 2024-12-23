@@ -1,5 +1,7 @@
 export type Maybe<T> = T | null;
 
+type KeysOf<T> = keyof T;
+
 export type Constructor<T = any, Arguments extends unknown[] = any[]> = new (
   ...arguments_: Arguments
 ) => T;
@@ -35,3 +37,9 @@ export enum SexEnum {
   Man = 1,
   Woman = 2,
 }
+
+export type Tree<T> = {
+  [K in KeysOf<T>]: T[K];
+} & {
+  children: Tree<T>[];
+};

@@ -6,12 +6,14 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { UserEntity } from './user.entity';
 import { PublicRoute, RequirePermission } from '@/decorators';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
 @ApiTags('users')
@@ -27,8 +29,16 @@ export class UserController {
 
   @Get(':username')
   @HttpCode(HttpStatus.OK)
-  async findOne(@Param() { username }: { username: string }) {
+  async findOne(@Param('username') username: string) {
     return await this.userService.findOne(username);
+  }
+
+  @Put(':username')
+  async update(
+    @Param('username') username: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return await this.userService.update(username, updateUserDto);
   }
 
   // TODO: Delete the unused controller, it's for the `@PublicRoute()` testing

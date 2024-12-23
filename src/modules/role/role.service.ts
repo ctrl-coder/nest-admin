@@ -6,6 +6,7 @@ import { RoleEntity } from './entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonRes } from '@/common/utils/common-res';
 import { MenuEntity } from '../menu/entities/menu.entity';
+import { difference } from 'lodash';
 
 @Injectable()
 export class RoleService {
@@ -21,7 +22,11 @@ export class RoleService {
     });
 
     if (menuEntities.length !== createRoleDto.menus.length) {
-      throw new BadRequestException('menu_id不存在!');
+      const ids = difference(
+        menuEntities.map((v) => v.id),
+        createRoleDto.menus,
+      );
+      throw new BadRequestException(`menu_id ${ids.join(', ')}不存在!`);
     }
 
     const savedRole = await this.roleRepository.save({

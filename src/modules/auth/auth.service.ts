@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import * as bcryptjs from 'bcryptjs';
+import { isEmpty } from 'lodash';
 import { UserRegisterDto } from './dto/user-register.dto';
 // import { jwtConfigs } from '@/constants';
 import { RedisService } from '@/shared/services/redis.service';
@@ -11,6 +12,7 @@ import { redisConfigs } from '@/constants/redis';
 import { MenuEntity } from '../menu/entities/menu.entity';
 import { generateUUID } from '@/common/utils';
 import { CacheEnum } from '@/common/types';
+import { MenuService } from '../menu/menu.service';
 
 @Injectable()
 export class AuthService {
@@ -23,7 +25,8 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
-  ) {}
+    private readonly menuService: MenuService
+  ) { }
 
   async getUser(user: UserEntity) {
     return this.user.findOneBy({ username: user.username });
@@ -38,23 +41,25 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload);
 
     const roleIds = user.roles.map((v) => v.id);
-    // TODO: extra to a single method and use menuService but not menoRepository
-    const menus = await this.menuRepository
-      .createQueryBuilder('menu')
-      .innerJoin('menu.roles', 'role')
-      .where('role.id IN (:...roleIds)', { roleIds })
-      .getMany();
-
-    const permissions = menus.map((v) => v.perms);
-    const roles = user.roles.map((v) => v.name);
 
     const metaData = {
       token: uuid,
-      roles,
-      permissions,
+      roles: [],
+      permissions: [],
       username: user.username,
       id: user.id,
     };
+
+    if (!isEmpty(roleIds)) {
+      // TODO: extra to a single method and use menuService but not menoRepository
+      const menus = await this.menuService.findMenusByRoles(roleIds);
+      const permissions = menus.map((v) => v.perms);
+      const roles = user.roles.map((v) => v.name);
+
+      metaData.permissions = permissions;
+      metaData.roles = roles;
+    }
+
     await this.redisService.set(
       `${CacheEnum.LOGIN_TOKEN_KEY}${uuid}`,
       metaData,

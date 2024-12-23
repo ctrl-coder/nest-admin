@@ -1,9 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePositionDto } from './dto/create-position.dto';
 import { UpdatePositionDto } from './dto/update-position.dto';
+import { CommonRes } from '@/common/utils/common-res';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PositionEntity } from './entities/position.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class PositionService {
+  constructor(
+    @InjectRepository(PositionEntity)
+    private positionRepository: Repository<PositionEntity>,
+  ) {}
+
   create(createPositionDto: CreatePositionDto) {
     return 'This action adds a new position';
   }
@@ -16,8 +25,9 @@ export class PositionService {
     return `This action returns a #${id} position`;
   }
 
-  update(id: number, updatePositionDto: UpdatePositionDto) {
-    return `This action updates a #${id} position`;
+  async update(id: number, updatePositionDto: UpdatePositionDto) {
+    const res = await this.positionRepository.update({ id }, updatePositionDto);
+    return CommonRes.ok(res);
   }
 
   remove(id: number) {
