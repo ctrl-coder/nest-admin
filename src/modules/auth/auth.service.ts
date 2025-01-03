@@ -25,14 +25,32 @@ export class AuthService {
 
     private readonly jwtService: JwtService,
     private readonly redisService: RedisService,
-    private readonly menuService: MenuService
-  ) { }
+    private readonly menuService: MenuService,
+  ) {}
 
   async getUser(user: UserEntity) {
     return this.user.findOneBy({ username: user.username });
   }
 
+  /**
+   * 从令牌中获取数据声明
+   *
+   * @param token 令牌
+   * @return 数据声明
+   */
+  parseToken(token: string) {
+    try {
+      if (!token) return null;
+      return this.jwtService.verify(token.replace('Bearer ', ''));
+    } catch (error) {
+      return null;
+    }
+  }
+
   async login(user: Partial<UserEntity>) {
+    // 这里使用uuid作为redis key，而不是user id，是为了支持用户多端登录的场景，
+    // 1. 当用户登陆后，生成uuid对应的token
+    // 2. 以集合的形式，以user id作为key将uuid存储到user id对应的redis集合中，每个user id可以生成/保持多个token
     const uuid = generateUUID();
     const payload = {
       userId: user.id,

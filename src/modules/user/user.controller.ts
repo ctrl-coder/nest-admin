@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   Put,
+  Request,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { UserService } from './user.service';
@@ -14,6 +16,7 @@ import { UserEntity } from './user.entity';
 import { PublicRoute, RequirePermission } from '@/decorators';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { TransactionInterceptor } from '@/intercepters';
 
 @Controller('users')
 @ApiTags('users')
@@ -34,6 +37,7 @@ export class UserController {
   }
 
   @Put(':username')
+  @UseInterceptors(TransactionInterceptor)
   async update(
     @Param('username') username: string,
     @Body() updateUserDto: UpdateUserDto,

@@ -3,9 +3,10 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Request,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, EntityManager, In, Repository } from 'typeorm';
 import * as bcryptjs from 'bcryptjs';
 import { UserEntity } from './user.entity';
 import { UserDto } from './dto/user.dto';
@@ -15,6 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { RoleEntity } from '../role/entities/role.entity';
 import { CommonRes } from '@/common/utils/common-res';
 import { SUPER_ADMIN } from '@/constants';
+import { TransactionManager } from '@/decorators';
 
 @Injectable()
 export class UserService {
@@ -26,7 +28,7 @@ export class UserService {
     @InjectRepository(RoleEntity)
     private roleRepository: Repository<RoleEntity>,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async validateDuplicated(conditions: { key: string; value: any }[]) {
     for (let index = 0; index < conditions.length; index++) {
@@ -71,7 +73,11 @@ export class UserService {
     return CommonRes.ok(savedUser);
   }
 
-  async update(username: string, updateDto: UpdateUserDto) {
+  async update(
+    username: string,
+    updateDto: UpdateUserDto,
+    @TransactionManager() transactionManager: EntityManager = null,
+  ) {
     // 不能修改超级管理员
     if (username === SUPER_ADMIN.username) {
       throw new BadRequestException('非法操作！');
@@ -89,7 +95,7 @@ export class UserService {
     if (isRolesChanged) {
       // 删除原有的user于rule的关联字段
       const toBeDeletedRoleIds = difference(savedRoleIds, updateRoleIds);
-      await this.dataSource
+      await transactionManager
         .getRepository('users_roles')
         .delete({ user_id: savedUser.id, role_id: In(toBeDeletedRoleIds) });
 
@@ -113,12 +119,12 @@ export class UserService {
     }
 
     // 先用update方法更新除关联关系外的基础字段
-    await this.userRepository.update(savedUser.id, {
+    await transactionManager.getRepository(UserEntity).update(savedUser.id, {
       ...omit(updateDto, 'roles'),
     });
 
     // 再使用save方法更新关联字段
-    const updatedUser = await this.userRepository.save(savedUser);
+    const updatedUser = await transactionManager.getRepository(UserEntity).save(savedUser);
 
     return CommonRes.ok(updatedUser);
   }

@@ -50,7 +50,7 @@ export class CreateMenuDto {
   public status: CommonStatus;
 
   @IsEnum(BooleanStatus)
-  public visiable: BooleanStatus;
+  public visible: BooleanStatus;
 
   @IsEnum(BooleanStatus)
   public isCache: BooleanStatus;

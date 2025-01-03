@@ -59,8 +59,8 @@ import { RedisModule } from '@nestjs-modules/ioredis';
         );
       },
     }),
-    UserModule,
     AuthModule,
+    UserModule,
     DepartmentModule,
     PositionModule,
     RoleModule,

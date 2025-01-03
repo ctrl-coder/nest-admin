@@ -28,7 +28,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     );
 
     if (!user) {
-      throw new UnauthorizedException('token is invalid!');
+      throw new UnauthorizedException('Token已经过期，请重新登录');
     }
     return user;
   }

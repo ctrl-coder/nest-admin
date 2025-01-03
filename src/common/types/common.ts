@@ -1,10 +1,4 @@
-export type Maybe<T> = T | null;
-
-type KeysOf<T> = keyof T;
-
-export type Constructor<T = any, Arguments extends unknown[] = any[]> = new (
-  ...arguments_: Arguments
-) => T;
+import { KeysOf } from './helper';
 
 export enum OrderEnum {
   ASC = 'ASC',

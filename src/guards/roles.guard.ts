@@ -14,11 +14,11 @@ export class RolesGuard implements CanActivate {
       ctx.getHandler(),
     ]);
 
-    //不需要鉴权
     if (role) {
       return this.hasRole(role, req.user.roles);
     }
 
+    //不需要鉴权
     return true;
   }
 

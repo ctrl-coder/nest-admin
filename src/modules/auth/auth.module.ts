@@ -35,5 +35,6 @@ import { MenuService } from '../menu/menu.service';
   ],
   controllers: [AuthController],
   providers: [AuthService, LocalStrategy, JwtStrategy, MenuService],
+  exports: [AuthService],
 })
 export class AuthModule { }

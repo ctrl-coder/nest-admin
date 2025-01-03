@@ -5,6 +5,8 @@ import { SharedModule } from './shared/shared.module';
 import { ServerConfigService } from './shared/services/config.service';
 import { ValidationPipe } from '@nestjs/common';
 
+import './global.polyfill';
+
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
